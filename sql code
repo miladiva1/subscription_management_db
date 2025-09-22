@@ -1,0 +1,176 @@
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    primeiro_nome VARCHAR(100) NOT NULL,
+    sobrenome VARCHAR(150) NOT NULL,
+    data_nascimento DATE,
+    genero ENUM('Masculino', 'Feminino', 'Outro', 'Prefiro não informar'),
+    cpf CHAR(11) UNIQUE,
+    rg VARCHAR(20),
+    estado_civil ENUM('Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'União Estável'),
+    nacionalidade VARCHAR(100),
+    email VARCHAR(150) UNIQUE NOT NULL,
+    telefone VARCHAR(20),
+    celular VARCHAR(20),
+    cep CHAR(8),
+    logradouro VARCHAR(150),
+    numero VARCHAR(10),
+    complemento VARCHAR(100),
+    bairro VARCHAR(100),
+    cidade VARCHAR(100),
+    estado CHAR(2),
+    pais VARCHAR(100) DEFAULT 'Brasil',
+    usuario_login VARCHAR(50) UNIQUE NOT NULL,
+    senha_hash VARCHAR(255) NOT NULL,
+    status ENUM('Ativo', 'Inativo', 'Bloqueado') DEFAULT 'Ativo',
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE planos (
+    id_plano INT AUTO_INCREMENT PRIMARY KEY,
+    nome_plano VARCHAR(50) UNIQUE NOT NULL,
+    descricao VARCHAR(255),
+    periodicidade ENUM('Mensal', 'Anual') NOT NULL DEFAULT 'Mensal',
+    preco DECIMAL(10,2) NOT NULL,
+    max_profiles INT NOT NULL DEFAULT 1,
+    qualidade ENUM('SD','HD','Full HD','4K') NOT NULL DEFAULT 'HD',
+    dispositivos_simultaneos INT NOT NULL DEFAULT 1,
+    ativo TINYINT(1) NOT NULL DEFAULT 1,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE assinaturas (
+    id_assinatura INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_plano INT NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE NULL,
+    status ENUM('Ativa','Cancelada','Pendente','Suspensa') NOT NULL DEFAULT 'Ativa',
+    metodo_pagamento ENUM('Cartao','Pix','Boleto') NOT NULL DEFAULT 'Cartao',
+    valor_mensal DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_assinaturas_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    CONSTRAINT fk_assinaturas_plano FOREIGN KEY (id_plano) REFERENCES planos(id_plano),
+    INDEX idx_assinaturas_usuario (id_usuario),
+    INDEX idx_assinaturas_plano (id_plano),
+    INDEX idx_assinaturas_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO usuarios (
+    primeiro_nome, sobrenome, data_nascimento, genero, cpf, rg, estado_civil, nacionalidade,
+    email, telefone, celular,
+    cep, logradouro, numero, complemento, bairro, cidade, estado, pais,
+    usuario_login, senha_hash, status
+) VALUES
+('Ana','Silva','1990-05-12','Feminino','12345678901','MG1234567','Solteiro','Brasileira',
+ 'ana.silva@example.com','1133334444','11988887777',
+ '01310000','Rua A','100',NULL,'Centro','São Paulo','SP','Brasil',
+ 'ana.silva','hash$ana', 'Ativo'),
+('Bruno','Souza','1988-11-23','Masculino','23456789012','SP2345678','Casado','Brasileira',
+ 'bruno.souza@example.com','1144445555','11977776666',
+ '20040001','Av. Brasil','200','Ap 12','Copacabana','Rio de Janeiro','RJ','Brasil',
+ 'bruno.souza','hash$bruno','Ativo'),
+('Carla','Oliveira','1995-02-10','Feminino','34567890123','RJ3456789','Solteiro','Brasileira',
+ 'carla.oliveira@example.com',NULL,'21999998888',
+ '30140000','Rua das Flores','50',NULL,'Savassi','Belo Horizonte','MG','Brasil',
+ 'carla.oliveira','hash$carla','Ativo'),
+('Diego','Almeida','1992-07-30','Masculino','45678901234','PR4567890','União Estável','Brasileira',
+ 'diego.almeida@example.com','4133332222','41999990000',
+ '80010000','Rua XV','123','','Centro','Curitiba','PR','Brasil',
+ 'diego.almeida','hash$diego','Ativo'),
+('Eduarda','Pereira','1985-01-05','Feminino','56789012345','SC5678901','Casado','Brasileira',
+ 'eduarda.pereira@example.com',NULL,'48977775555',
+ '88010000','Av. Central','789','Casa','Trindade','Florianópolis','SC','Brasil',
+ 'eduarda.pereira','hash$eduarda','Ativo'),
+('Felipe','Gomes','1998-09-14','Masculino','67890123456','RS6789012','Solteiro','Brasileira',
+ 'felipe.gomes@example.com','5132124545','51988887766',
+ '90010000','Rua Porto','321',NULL,'Moinhos','Porto Alegre','RS','Brasil',
+ 'felipe.gomes','hash$felipe','Ativo'),
+('Gabriela','Rocha','1993-03-22','Feminino','78901234567','BA7890123','Divorciado','Brasileira',
+ 'gabriela.rocha@example.com',NULL,'71999991111',
+ '40020000','Rua do Sol','45','Bloco B','Pelourinho','Salvador','BA','Brasil',
+ 'gabriela.rocha','hash$gabriela','Ativo'),
+('Henrique','Barbosa','1987-12-02','Masculino','89012345678','PE8901234','Casado','Brasileira',
+ 'henrique.barbosa@example.com','8133445566','81988886666',
+ '50010000','Av. Recife','222','','Boa Viagem','Recife','PE','Brasil',
+ 'henrique.barbosa','hash$henrique','Ativo'),
+('Isabela','Mendes','1999-06-18','Feminino','90123456789','CE9012345','Solteiro','Brasileira',
+ 'isabela.mendes@example.com',NULL,'85999994444',
+ '60010000','Rua Mar','60',NULL,'Centro','Fortaleza','CE','Brasil',
+ 'isabela.mendes','hash$isabela','Ativo'),
+('João','Ferreira','1986-10-09','Masculino','01234567890','DF0123456','Viúvo','Brasileira',
+ 'joao.ferreira@example.com','6133337777','61977778888',
+ '70040000','SQS 308','20','Ap 303','Asa Sul','Brasília','DF','Brasil',
+ 'joao.ferreira','hash$joao','Ativo');
+
+INSERT INTO planos (nome_plano, descricao, periodicidade, preco, max_profiles, qualidade, dispositivos_simultaneos, ativo) VALUES
+('Básico SD','1 perfil, qualidade SD','Mensal',19.90,1,'SD',1,1),
+('Padrão HD','2 perfis, qualidade HD','Mensal',29.90,2,'HD',2,1),
+('Família Full HD','4 perfis, Full HD','Mensal',39.90,4,'Full HD',3,1),
+('Premium 4K','5 perfis, 4K','Mensal',59.90,5,'4K',4,1),
+('Anual Básico','Plano básico anual','Anual',199.00,1,'SD',1,1),
+('Anual Padrão','Plano padrão anual','Anual',299.00,2,'HD',2,1),
+('Estudante HD','Desconto estudante','Mensal',24.90,1,'HD',1,1),
+('Mobile SD','Apenas mobile SD','Mensal',14.90,1,'SD',1,1),
+('Pro 4K+','Perfis extra e 4K','Mensal',79.90,6,'4K',5,1),
+('Corporativo HD','Para empresas','Mensal',89.90,10,'HD',6,1);
+
+INSERT INTO assinaturas (id_usuario, id_plano, data_inicio, data_fim, status, metodo_pagamento, valor_mensal) VALUES
+(1, 2, '2025-06-01', NULL, 'Ativa', 'Cartao', 29.90),
+(2, 4, '2025-05-15', NULL, 'Ativa', 'Cartao', 59.90),
+(3, 1, '2025-07-10', NULL, 'Ativa', 'Pix', 19.90),
+(4, 3, '2025-02-20', '2025-08-31', 'Cancelada', 'Boleto', 39.90),
+(5, 6, '2025-01-05', NULL, 'Ativa', 'Cartao', 299.00),
+(6, 7, '2025-07-01', NULL, 'Ativa', 'Pix', 24.90),
+(7, 9, '2025-03-12', NULL, 'Suspensa', 'Cartao', 79.90),
+(8,10, '2025-04-25', NULL, 'Ativa', 'Cartao', 89.90),
+(9, 8, '2025-08-02', NULL, 'Pendente','Pix', 14.90),
+(10,5, '2024-12-01', '2025-12-01', 'Ativa', 'Cartao',199.00);
+
+CREATE OR REPLACE VIEW v_usuarios_contato AS
+SELECT
+  id_usuario,
+  CONCAT(primeiro_nome, ' ', sobrenome) AS nome_completo,
+  email,
+  celular,
+  cidade,
+  estado,
+  status
+FROM usuarios
+WHERE status = 'Ativo';
+
+CREATE OR REPLACE VIEW v_assinaturas_vigentes AS
+SELECT
+  a.id_assinatura,
+  a.id_usuario,
+  p.nome_plano,
+  p.qualidade,
+  p.dispositivos_simultaneos,
+  a.data_inicio,
+  a.data_fim,
+  a.status,
+  a.metodo_pagamento,
+  a.valor_mensal
+FROM assinaturas a
+JOIN planos p ON p.id_plano = a.id_plano
+WHERE a.status = 'Ativa'
+  AND (a.data_fim IS NULL OR a.data_fim >= CURDATE());
+
+CREATE OR REPLACE VIEW v_clientes_ativos_detalhado AS
+SELECT
+  u.id_usuario,
+  CONCAT(u.primeiro_nome, ' ', u.sobrenome) AS nome_completo,
+  u.email,
+  p.nome_plano,
+  p.qualidade,
+  p.max_profiles,
+  p.dispositivos_simultaneos,
+  a.data_inicio,
+  a.valor_mensal,
+  a.metodo_pagamento
+FROM usuarios u
+JOIN assinaturas a ON a.id_usuario = u.id_usuario
+JOIN planos p ON p.id_plano = a.id_plano
+WHERE u.status = 'Ativo'
+  AND a.status = 'Ativa'
+  AND (a.data_fim IS NULL OR a.data_fim >= CURDATE());
